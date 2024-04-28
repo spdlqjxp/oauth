@@ -1,37 +1,56 @@
 package OAuth.practice.oauth.config;
 
 import OAuth.practice.oauth.service.OAuth2Service;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-
+@Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final OAuth2Service oAuth2Service;
 
+    public SecurityConfig(OAuth2Service oAuth2Service) {
+        this.oAuth2Service = oAuth2Service;
+    }
+
     @Bean
-    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        return http.csrf().disable() // csrf 보안 설정 사용 X
-                .logout().disable() // 로그아웃 사용 X
-                .formLogin().disable() // 폼 로그인 사용 X
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
-                .authorizeRequests() // 사용자가 보내는 요청에 인증 절차 수행 필요
-                .requestMatchers("/").permitAll() // 해당 URL은 인증 절차 수행 생략 가능
-                .anyRequest().authenticated() // 나머지 요청들은 모두 인증 절차 수행해야함
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 
-                .and()
-                .oauth2Login() // OAuth2를 통한 로그인 사용
-                .defaultSuccessUrl("/oauth/loginInfo", true) // 로그인 성공시 이동할 URL
-                .userInfoEndpoint() // 사용자가 로그인에 성공하였을 경우,
-                .userService(oAuth2Service) // 해당 서비스 로직을 타도록 설정
+        http
+                .csrf((auth) -> auth.disable());
 
-                .and()
-                .and().build();
+        http
+                .formLogin((auth) -> auth.disable());
 
+        http
+                .httpBasic((auth) -> auth.disable());
+
+        http
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/","/user/signup", "/user/login", "/user").permitAll()
+                        .anyRequest().authenticated());
+
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http
+                .oauth2Login()
+                .loginPage("/user/login")
+                .defaultSuccessUrl("/oauth/loginfo")
+                .userInfoEndpoint()
+                .userService(oAuth2Service);
+
+        return http.build();
     }
 }

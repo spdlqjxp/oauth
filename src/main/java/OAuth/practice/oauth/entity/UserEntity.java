@@ -2,29 +2,33 @@ package OAuth.practice.oauth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
 
-@Getter
+import java.time.LocalDate;
+
 @Entity
-@DynamicUpdate
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
+    @Column(name = "id", updatable = false)
+    private int id;
 
-    @Column(name = "username", nullable = false)
+    private String userId;
     private String userName;
-    @Column(name = "email")
     private String email;
-    @Column(name = "provider", nullable = false)
+    private String password;
+    private String passwordCheck;
+    private String phone;
+    private LocalDate birth;
     private String provider;
 
-    public User updateUser(String userName, String email) {
+
+    public UserEntity updateUser(String userName, String email) {
         this.userName = userName;
         this.email = email;
         return this;
