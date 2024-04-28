@@ -2,7 +2,7 @@ package OAuth.practice.oauth.service;
 
 import OAuth.practice.oauth.attribute.OAuthAttributes;
 import OAuth.practice.oauth.dto.UserProfile;
-import OAuth.practice.oauth.entity.User;
+import OAuth.practice.oauth.entity.UserEntity;
 import OAuth.practice.oauth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,8 +66,8 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
         return customAttribute;
     }
 
-    public User updateOrSaveUser(UserProfile userProfile) {
-        User user = userRepository
+    public UserEntity updateOrSaveUser(UserProfile userProfile) {
+        UserEntity user = userRepository
                 .findUserByEmailAndProvider(userProfile.getEmail(), userProfile.getProvider())
                 .map(value -> value.updateUser(userProfile.getUsername(), userProfile.getEmail()))
                 .orElse(userProfile.toEntity());
