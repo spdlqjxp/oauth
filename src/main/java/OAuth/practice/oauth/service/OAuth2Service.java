@@ -5,6 +5,7 @@ import OAuth.practice.oauth.dto.UserProfile;
 import OAuth.practice.oauth.entity.UserEntity;
 import OAuth.practice.oauth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -28,7 +30,7 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
-
+        log.info("OAuth2User: {}", oAuth2User);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         String userNameAttributeName = userRequest
                 .getClientRegistration()
